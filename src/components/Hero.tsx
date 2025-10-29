@@ -3,6 +3,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { Button } from "@/components/ui/button";
 import CriteriaModalButton from "@/components/CriteriaModalButton";
+import { ArrowUpRight } from "lucide-react";
 
 
 
@@ -24,13 +25,26 @@ export default async function Hero() {
               Helping qualified applicants cover rent costs quickly and easily.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
-              <Button asChild size="lg">
+              <Button
+                asChild
+                size="lg"
+                className="bg-linear-to-b from-primary to-primary/90 shadow-md transition-transform hover:shadow-lg active:shadow-sm -translate-y-0.5 hover:-translate-y-1 active:translate-y-0"
+              >
                 <Link href="#apply">Apply Now</Link>
               </Button>
-              <CriteriaModalButton />
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="border-2 ring-1 ring-inset ring-black/5 dark:ring-white/10 bg-linear-to-b from-background to-background/90 dark:from-input/40 dark:to-input/60 shadow-sm transition-transform hover:shadow-md -translate-y-0.5 hover:-translate-y-1 active:translate-y-0"
+              >
+                <Link href={"/eligibility"}>
+                  Read Criteria
+                  <ArrowUpRight className="ml-2 inline-block size-4" />
+                </Link>
+              </Button>
             </div>
           </div>
-
           <div className="relative h-64 w-full sm:h-80 md:h-96 lg:h-112">
             <Image
               src="/new_bg3.png"
