@@ -1,9 +1,14 @@
-import React from 'react'
+import { HeroHeader } from "@/components/Header";
+import Hero from "@/components/Hero";
 
-export default function page() {
+export default function HomePage() {
   return (
-    <div>
-      <h1 >Hello, world!</h1>
+    <div className="flex min-h-screen flex-col bg-background">
+      <HeroHeader />
+      <main className="flex-1">
+        <Hero />
+        {/* Sections will be added in subsequent steps */}
+      </main>
     </div>
   )
 }
