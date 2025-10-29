@@ -48,7 +48,7 @@ export const HeroHeader = () => {
                     <MobileNavHeader>
                         <Link href="/" aria-label="home" className="flex items-center gap-2">
                             <Image src="/home-button.png" alt="Home" width={24} height={24} className="rounded" />
-                            <span className="text-base font-semibold tracking-tight">StateRent Assistance</span>
+                            <span className="text-base font-semibold tracking-tight">Rent Assistance</span>
                         </Link>
                         <MobileNavToggle isOpen={mobileOpen} onClick={() => setMobileOpen((v) => !v)} />
                     </MobileNavHeader>
