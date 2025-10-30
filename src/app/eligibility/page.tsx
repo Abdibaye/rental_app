@@ -3,6 +3,7 @@ import { Navbar } from "@/components/ui/resizable-navbar"
 import { HeroHeader } from "@/components/Header"
 import Footer from "@/components/Footer"
 import { CheckCircle2, Info, FileText } from "lucide-react"
+import LocationRegion from "@/components/LocationRegion"
 
 
 
@@ -46,7 +47,9 @@ export default function EligibilityPage() {
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="mt-0.5 h-5 w-5 flex-none text-primary" />
-                    <span>Must be a current resident of the state of California.</span>
+                    <span>
+                      Must be a current resident of the state of <LocationRegion defaultRegion="California" />.
+                    </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="mt-0.5 h-5 w-5 flex-none text-primary" />

@@ -1,17 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { headers } from "next/headers";
 import { Button } from "@/components/ui/button";
 import CriteriaModalButton from "@/components/CriteriaModalButton";
 import { ArrowUpRight } from "lucide-react";
+import LocationTitle from "@/components/LocationTitle";
 
-
-
-
-
-export default async function Hero() {
-
-  const title = `California Rental Assistance Program`;
+export default function Hero() {
 
   return (
     <section className="relative isolate overflow-hidden">
@@ -19,7 +13,7 @@ export default async function Hero() {
         <div className="grid items-center gap-10 md:grid-cols-2">
           <div className="space-y-6">
             <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-              {title}
+              <LocationTitle defaultRegion="California" />
             </h1>
             <p className="text-muted-foreground text-base md:text-lg">
               Helping qualified applicants cover rent costs quickly and easily.

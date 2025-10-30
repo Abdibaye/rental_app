@@ -30,7 +30,7 @@ export const HeroHeader = () => {
                 <NavBody>
                     <Link href="/" aria-label="home" className="flex items-center gap-2">
                         <Image src="/home-button.png" alt="Home" width={24} height={24} className="rounded" />
-                        <span className="text-xl font-extrabold tracking-tight">Rent Assistance</span>
+                        <span className="text-xl font-extrabold tracking-tight">StateRent Assistance</span>
                     </Link>
                     <NavItems items={menuItems.map((m) => ({ name: m.name, link: m.href }))} />
                     <div className="flex items-center gap-3">
