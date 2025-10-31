@@ -141,11 +141,11 @@ export function EligibilityStep({ data, onChange, disabled }: EligibilityStepPro
           </fieldset>
 
           <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
-            <div className="space-y-4">
-              <Label htmlFor="householdSize" className="text-sm font-semibold text-foreground">
-                Household size
-              </Label>
-              <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="householdSize" className="text-sm font-semibold text-foreground">
+                  How many people are in your household? (include yourself)
+                </Label>
                 <Input
                   id="householdSize"
                   type="number"
@@ -157,28 +157,38 @@ export function EligibilityStep({ data, onChange, disabled }: EligibilityStepPro
                   disabled={disabled}
                   required
                 />
+                <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Users className="h-3.5 w-3.5" aria-hidden />
+                  Include everyone who lives with you when determining the household size.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="monthlyIncome" className="text-sm font-semibold text-foreground">
+                  What is your household&apos;s current monthly income?
+                </Label>
                 <Input
                   id="monthlyIncome"
                   type="number"
                   min={0}
                   step="100"
                   inputMode="decimal"
-                  placeholder="Monthly income (USD)"
+                  placeholder="Monthly income from the last 30 days"
                   value={data.monthlyIncome}
                   onChange={(event) => onChange({ monthlyIncome: event.target.value })}
                   disabled={disabled}
                   required
                 />
+                <p className="flex items-start gap-2 text-xs text-muted-foreground">
+                  <Info className="mt-0.5 h-3.5 w-3.5" aria-hidden />
+                  Please include income from employment (formal or informal) and cash benefits from the last 30 days. If you have savings or cash resources that total three times your monthly rent, you are not eligible for this program.
+                </p>
               </div>
-              <p className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Users className="h-3.5 w-3.5" aria-hidden />
-                This helps us estimate assistance levels for your household.
-              </p>
             </div>
 
             <div className="space-y-3 rounded-2xl border border-border/70 bg-background/70 p-5 shadow-sm">
               <Label htmlFor="assistanceType" className="text-sm font-semibold text-foreground">
-                What are you applying for?
+                Are you applying for assistance with past-due rent OR assistance with moving into a new unit (security deposit, etc.)?
               </Label>
               <div className="relative">
                 <select
