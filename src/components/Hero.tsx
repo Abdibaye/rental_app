@@ -24,7 +24,7 @@ export default function Hero() {
                 size="lg"
                 className="bg-linear-to-b from-primary to-primary/90 shadow-md transition-transform hover:shadow-lg active:shadow-sm -translate-y-0.5 hover:-translate-y-1 active:translate-y-0"
               >
-                <Link href="#apply">Apply Now</Link>
+                <Link href="apply">Apply Now</Link>
               </Button>
               <Button
                 asChild
