@@ -12,10 +12,15 @@ export default function Hero() {
       <div className="mx-auto max-w-6xl px-6 pt-28 pb-12 lg:pt-36 lg:pb-20">
         <div className="grid items-center gap-10 md:grid-cols-2">
           <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-linear-to-r from-primary via-primary/90 to-primary px-4 py-2 text-sm font-semibold text-white shadow-md shadow-primary/20 backdrop-blur dark:from-primary/80 dark:via-primary dark:to-primary/80">
-              <Sparkles className="size-4" />
-              <span className="leading-none">
-                Qualify for up to 1 year rental assistance, if approved
+            <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-linear-to-r from-primary/80 via-primary to-primary/80 px-5 py-2 text-sm font-medium text-white/90 shadow-md shadow-primary/25 backdrop-blur dark:border-white/5">
+              <Sparkles className="size-4 text-white" />
+              <span className="flex flex-wrap items-center gap-2 leading-none text-white/80">
+                <span className="text-white">Qualify for up to</span>
+                <span className="rounded-full bg-white/15 px-2 py-0.5 text-xs font-semibold uppercase tracking-widest text-white shadow-sm shadow-primary/30">
+                  1 year
+                </span>
+                <span className="text-white">rental assistance</span>
+                <span className="text-white/60">if approved</span>
               </span>
             </div>
             <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
