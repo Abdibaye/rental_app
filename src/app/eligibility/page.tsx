@@ -16,8 +16,8 @@ export default function EligibilityPage() {
       <main className="relative flex-1 overflow-hidden">
         {/* Decorative background */}
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute left-1/2 top-24 h-40 w-[36rem] -translate-x-1/2 rounded-full bg-gradient-to-r from-primary/20 to-primary/5 blur-3xl" />
-          <div className="absolute -right-24 bottom-20 h-40 w-[28rem] rounded-full bg-gradient-to-r from-primary/10 to-primary/5 blur-3xl" />
+          <div className="absolute left-1/2 top-24 h-40 w-xl -translate-x-1/2 rounded-full bg-linear-to-r from-primary/20 to-primary/5 blur-3xl" />
+          <div className="absolute -right-24 bottom-20 h-40 w-md rounded-full bg-linear-to-r from-primary/10 to-primary/5 blur-3xl" />
         </div>
 
         <div className="mx-auto max-w-3xl px-6 pt-28 pb-16 lg:pt-36 lg:pb-24">
@@ -26,7 +26,7 @@ export default function EligibilityPage() {
               <span className="h-2 w-2 rounded-full bg-primary" />
               Program details
             </span>
-            <h1 className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl">
+            <h1 className="bg-linear-to-r from-primary to-primary/60 bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl">
               Eligibility
             </h1>
             <p className="text-muted-foreground text-base md:text-lg">

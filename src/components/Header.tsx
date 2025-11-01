@@ -35,7 +35,7 @@ export const HeroHeader = () => {
                     <NavItems items={menuItems.map((m) => ({ name: m.name, link: m.href }))} />
                     <div className="flex items-center gap-3">
                         <Button asChild size="sm">
-                            <Link href="#apply">Apply Now</Link>
+                            <Link href="apply">Apply Now</Link>
                         </Button>
                         <span className="mr-2.5">
                             <ThemeToggle />
