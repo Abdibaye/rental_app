@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import CriteriaModalButton from "@/components/CriteriaModalButton";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Sparkles } from "lucide-react";
 import LocationTitle from "@/components/LocationTitle";
 
 export default function Hero() {
@@ -12,6 +12,12 @@ export default function Hero() {
       <div className="mx-auto max-w-6xl px-6 pt-28 pb-12 lg:pt-36 lg:pb-20">
         <div className="grid items-center gap-10 md:grid-cols-2">
           <div className="space-y-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-linear-to-r from-primary via-primary/90 to-primary px-4 py-2 text-sm font-semibold text-white shadow-md shadow-primary/20 backdrop-blur dark:from-primary/80 dark:via-primary dark:to-primary/80">
+              <Sparkles className="size-4" />
+              <span className="leading-none">
+                Qualify for up to 1 year rental assistance, if approved
+              </span>
+            </div>
             <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
               <LocationTitle defaultRegion="California" />
             </h1>

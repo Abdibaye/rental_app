@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState } from "react"
 import { useLocalStorage } from "usehooks-ts"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { ArrowRight, Check, ChevronLeft, ShieldCheck, Sparkles, X } from "lucide-react"
+import { ArrowRight, Check, CheckCircle2, ChevronLeft, ShieldCheck, Sparkles, X } from "lucide-react"
 import { EligibilityStep } from "./EligibilityStep"
 import { ApplicantInformationStep } from "./ApplicantInformationStep"
 import { DemographicsStep } from "./DemographicsStep"
@@ -23,6 +23,7 @@ import {
   EmploymentFormState
 } from "./types"
 import { FormStepper } from "./FormStepper"
+import BasicModal from "@/components/smoothui/ui/BasicModal"
 
 const FORM_STORAGE_KEY = "rental-application/form-state-v1"
 const STEP_STORAGE_KEY = "rental-application/form-step-v1"
@@ -111,6 +112,7 @@ export function MultiStepForm() {
   const [currentStepIndex, setCurrentStepIndex] = useLocalStorage<number>(STEP_STORAGE_KEY, 0)
   const [approvalGranted, setApprovalGranted] = useLocalStorage<boolean>(APPROVAL_STORAGE_KEY, false)
   const [approvalPromptOpen, setApprovalPromptOpen] = useState(false)
+  const [submissionModalOpen, setSubmissionModalOpen] = useState(false)
 
   const currentStep = stepDefinitions[currentStepIndex]
 
@@ -203,8 +205,15 @@ export function MultiStepForm() {
       setApprovalPromptOpen(true)
       return
     }
+    if (currentStepIndex >= stepDefinitions.length - 1) {
+      setSubmissionModalOpen(true)
+      setFormState(defaultFormState)
+      setCurrentStepIndex(0)
+      setApprovalGranted(false)
+      return
+    }
     goToStep(currentStepIndex + 1)
-  }, [approvalGranted, currentStep?.id, currentStepIndex, goToStep, isNextDisabled])
+  }, [approvalGranted, currentStep?.id, currentStepIndex, goToStep, isNextDisabled, setApprovalGranted, setCurrentStepIndex, setFormState, setSubmissionModalOpen])
 
   const handleBack = useCallback(() => {
     goToStep(currentStepIndex - 1)
@@ -219,6 +228,10 @@ export function MultiStepForm() {
     setApprovalPromptOpen(false)
     goToStep(currentStepIndex + 1)
   }, [currentStepIndex, goToStep, setApprovalGranted])
+
+  const handleCloseSubmissionModal = useCallback(() => {
+    setSubmissionModalOpen(false)
+  }, [])
 
   const renderStep = useCallback(() => {
     if (!currentStep) return null
@@ -360,6 +373,28 @@ export function MultiStepForm() {
           </div>
         </CardContent>
       </Card>
+
+      <BasicModal
+        isOpen={submissionModalOpen}
+        onClose={handleCloseSubmissionModal}
+        title="Application submitted"
+        size="md"
+      >
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <CheckCircle2 className="h-10 w-10" aria-hidden />
+          </div>
+          <div className="space-y-1">
+            <h4 className="text-xl font-semibold text-foreground">Thank you!</h4>
+            <p className="text-sm text-muted-foreground">
+              Your application has been submitted. Our team will review the details and follow up shortly.
+            </p>
+          </div>
+          <Button onClick={handleCloseSubmissionModal} className="px-6">
+            Close
+          </Button>
+        </div>
+      </BasicModal>
     </div>
   )
 }
