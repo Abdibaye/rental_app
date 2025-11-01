@@ -67,7 +67,11 @@ const defaultFormState: MultiStepFormState = {
     livesInSF: "",
     householdSize: "",
     monthlyIncome: "",
-    assistanceType: ""
+    assistanceType: "",
+    detectedCity: "",
+    detectedRegion: "",
+    detectedRegionCode: "",
+    actualCity: ""
   },
   applicantInfo: {
     referralSource: "",
@@ -132,10 +136,19 @@ export function MultiStepForm() {
 
   const isEligibilityValid = useMemo(() => {
     const values = formState.eligibility
-    if (values.livesInSF !== "yes") return false
+    if (!values.livesInSF) return false
     if (!values.householdSize.trim()) return false
     if (!values.monthlyIncome.trim()) return false
     if (!values.assistanceType.trim()) return false
+    const actualCity = (values.actualCity ?? "").trim()
+    const detectedState = (values.detectedRegion || values.detectedRegionCode || "").trim().toLowerCase()
+    const detectedStateCode = (values.detectedRegionCode || "").trim().toLowerCase()
+    if (actualCity && detectedState) {
+      const actualLower = actualCity.toLowerCase()
+      const matchesStateName = detectedState && actualLower.includes(detectedState)
+      const matchesStateCode = detectedStateCode ? new RegExp(`\\b${detectedStateCode}\\b`).test(actualLower) : false
+      if (!matchesStateName && !matchesStateCode) return false
+    }
     const parsedSize = Number(values.householdSize)
     const parsedIncome = Number(values.monthlyIncome)
     return Number.isFinite(parsedSize) && parsedSize > 0 && Number.isFinite(parsedIncome) && parsedIncome >= 0

@@ -1,11 +1,13 @@
 "use client"
 
+import { useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
-import { BadgeCheck, Building2, Info, LifeBuoy, ShieldCheck, Sparkles, Timer, Users, Wallet } from "lucide-react"
+import { fetchLocationWithCache } from "@/lib/locationClient"
+import { BadgeCheck, Info, MapPin, ShieldCheck, Sparkles, Timer, Users, Wallet } from "lucide-react"
 import { EligibilityFormState } from "./types"
+const isSanFrancisco = (value: string) => /san\s*francisco/i.test(value)
 
 export type EligibilityStepProps = {
   data: EligibilityFormState
@@ -14,7 +16,77 @@ export type EligibilityStepProps = {
 }
 
 export function EligibilityStep({ data, onChange, disabled }: EligibilityStepProps) {
-  const showIneligibleNotice = data.livesInSF === "no"
+  const actualCityValue = data.actualCity ?? ""
+  const detectedCityName = (data.detectedCity ?? "").trim()
+  const detectedRegionName = (data.detectedRegion ?? "").trim()
+  const detectedRegionCode = (data.detectedRegionCode ?? "").trim()
+  const stateDescriptor = detectedRegionName || detectedRegionCode
+  const stateLabelForDisplay = detectedRegionName || (detectedRegionCode ? detectedRegionCode.toUpperCase() : "")
+  const overridePlaceholder = stateLabelForDisplay ? `e.g. City, ${stateLabelForDisplay}` : "e.g. City, State"
+  const normalizedStateName = detectedRegionName.toLowerCase()
+  const normalizedStateCode = detectedRegionCode.toLowerCase()
+  const matchesStateName = (value: string) => normalizedStateName ? value.includes(normalizedStateName) : false
+    const matchesStateCode = (value: string) => normalizedStateCode ? new RegExp(`\\b${normalizedStateCode}\\b`).test(value) : false
+  const normalizedActualCity = actualCityValue.trim().toLowerCase()
+  const hasStateInfo = Boolean(detectedRegionName || detectedRegionCode)
+  const actualCityInvalid = hasStateInfo && normalizedActualCity.length > 0 && !matchesStateName(normalizedActualCity) && !matchesStateCode(normalizedActualCity)
+  const detectedLocationRaw = [detectedCityName, stateDescriptor].filter(Boolean).join(", ")
+  const hasDetectedLocation = detectedLocationRaw.length > 0
+  const detectedLocationDisplay = hasDetectedLocation ? detectedLocationRaw : "Detecting location…"
+
+  useEffect(() => {
+    if (!data.detectedCity || data.detectedRegion || data.detectedRegionCode) return
+    if (!data.detectedCity.includes(",")) return
+    const parts = data.detectedCity
+      .split(",")
+      .map((part) => part.trim())
+      .filter(Boolean)
+    if (parts.length < 2) return
+    const cityPart = parts.slice(0, -1).join(", ")
+    const regionPart = parts[parts.length - 1]
+    const payload: Partial<EligibilityFormState> = {}
+    if (cityPart && cityPart !== data.detectedCity) payload.detectedCity = cityPart
+    if (regionPart) payload.detectedRegion = regionPart
+    if (Object.keys(payload).length > 0) {
+      onChange(payload)
+    }
+  }, [data.detectedCity, data.detectedRegion, data.detectedRegionCode, onChange])
+
+  useEffect(() => {
+    let isCancelled = false
+    const shouldFetch = !data.detectedCity || !data.detectedRegion || !data.detectedRegionCode
+    if (!shouldFetch) return
+
+    ;(async () => {
+      const result = await fetchLocationWithCache()
+      if (!result || isCancelled) return
+      const city = (result.city ?? "").trim()
+      const region = (result.region ?? "").trim()
+      const regionCode = (result.region_code ?? "").trim()
+      if (!city && !region && !regionCode) return
+      const nextPayload: Partial<EligibilityFormState> = {}
+      if (city && city !== data.detectedCity) nextPayload.detectedCity = city
+      if (region && region !== data.detectedRegion) nextPayload.detectedRegion = region
+      if (regionCode && regionCode !== data.detectedRegionCode) nextPayload.detectedRegionCode = regionCode
+      if (Object.keys(nextPayload).length > 0) {
+        onChange(nextPayload)
+      }
+    })()
+
+    return () => {
+      isCancelled = true
+    }
+  }, [data.detectedCity, data.detectedRegion, data.detectedRegionCode, onChange])
+
+  useEffect(() => {
+    const derivedDetected = detectedLocationRaw
+    const resolved = actualCityValue.trim() || derivedDetected
+    if (!resolved) return
+    const next = isSanFrancisco(resolved) ? "yes" : "no"
+    if (data.livesInSF !== next) {
+      onChange({ livesInSF: next as EligibilityFormState["livesInSF"] })
+    }
+  }, [actualCityValue, detectedLocationRaw, data.livesInSF, onChange])
 
   return (
     <div className="space-y-10">
@@ -75,69 +147,75 @@ export function EligibilityStep({ data, onChange, disabled }: EligibilityStepPro
             })}
           </div>
 
-          <fieldset className="space-y-4">
-            <legend className="text-base font-medium text-foreground">Do you currently live in San Francisco?</legend>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {[{
-                label: "Yes, I live in San Francisco",
-                value: "yes",
-                description: "Unlocks the full application.",
-                icon: Building2
-              }, {
-                label: "No, I live elsewhere",
-                value: "no",
-                description: "We’ll point you to alternate resources.",
-                icon: LifeBuoy
-              }].map((option) => {
-                const Icon = option.icon
-
-                return (
-                  <label
-                    key={option.value}
-                    className={cn(
-                      "group flex cursor-pointer items-start gap-3 rounded-2xl border border-border/80 bg-background/90 p-4 transition duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md focus-within:ring-2 focus-within:ring-primary",
-                      data.livesInSF === option.value && "border-primary/60 bg-primary/5 shadow-lg"
-                    )}
-                  >
-                    <input
-                      type="radio"
-                      name="livesInSF"
-                      value={option.value}
-                      checked={data.livesInSF === option.value}
-                      onChange={() => onChange({ livesInSF: option.value as EligibilityFormState["livesInSF"] })}
-                      className="sr-only"
-                      disabled={disabled}
-                      required
-                    />
-                    <span className="flex w-full flex-col gap-2">
-                      <span className="flex items-center justify-between">
-                        <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                          <Icon className="h-4 w-4 text-primary" aria-hidden />
-                          {option.label}
-                        </span>
-                        <span
-                          className={cn(
-                            "inline-flex h-5 w-5 items-center justify-center rounded-full border text-[10px] font-semibold uppercase transition",
-                            data.livesInSF === option.value ? "border-primary bg-primary text-primary-foreground" : "border-muted text-muted-foreground"
-                          )}
-                          aria-hidden
-                        >
-                          {data.livesInSF === option.value ? "✓" : ""}
-                        </span>
-                      </span>
-                      <span className="text-xs text-muted-foreground">{option.description}</span>
-                    </span>
-                  </label>
-                )
-              })}
+          <fieldset className="space-y-6 rounded-3xl border border-border/60 bg-gradient-to-br from-background/90 via-background/70 to-primary/10 p-6 shadow-sm">
+            <legend className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/70">
+              Location Check
+            </legend>
+            <div className="space-y-2">
+              <h3 className="text-xl font-semibold text-foreground">Where do you live currently?</h3>
+              <p className="text-sm text-muted-foreground">
+                {hasDetectedLocation ? (
+                  <>
+                    We auto-detected your region as <span className="font-medium text-foreground">{detectedLocationDisplay}</span>. Update it if this looks off.
+                  </>
+                ) : (
+                  <>We&apos;re detecting your region. You can enter your city manually if it doesn&apos;t appear automatically.</>
+                )}
+              </p>
             </div>
-            <div role="status" aria-live="polite">
-              {showIneligibleNotice && (
-                <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                  We currently support San Francisco residents only. Please reach out to our team for other assistance options.
+            <div className="rounded-2xl border border-primary/20 bg-background/90 p-4 shadow-sm">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <MapPin className="h-5 w-5" aria-hidden />
+                  </span>
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-foreground">Auto-detected location</p>
+                    <p className="text-xs text-muted-foreground">Based on your browser or IP. This field is read-only.</p>
+                  </div>
+                </div>
+                <div className="relative w-full sm:max-w-xs">
+                  <Input
+                    id="detectedCity"
+                    value={detectedLocationDisplay}
+                    readOnly
+                    className="h-11 rounded-xl border border-transparent bg-primary/10 pr-10 font-medium text-primary shadow-inner"
+                    aria-readonly
+                  />
+                  <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-primary/60">
+                    <MapPin className="h-4 w-4" aria-hidden />
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="actualCity" className="text-sm font-medium text-foreground">
+                Actual city (optional)
+              </Label>
+              <Input
+                id="actualCity"
+                placeholder={overridePlaceholder}
+                value={actualCityValue}
+                onChange={(event) => onChange({ actualCity: event.target.value })}
+                disabled={disabled}
+                aria-invalid={actualCityInvalid}
+                className="h-11 rounded-xl border-border/70 bg-background/95 shadow-sm focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40"
+              />
+              <p className="text-xs text-muted-foreground">
+                Leave blank to keep the detected location. If you change it, include the state name or abbreviation so we can confirm it matches your current state.
+              </p>
+              {actualCityValue.trim().length > 0 && (
+                <p className="text-xs text-primary/80">
+                  Make sure the city stays within {stateLabelForDisplay ? stateLabelForDisplay : "the same state you are currently in"}.
+                </p>
+              )}
+              {actualCityInvalid && (
+                <p className="text-xs font-medium text-destructive">
+                  Please include {stateLabelForDisplay ? stateLabelForDisplay : "your state name or abbreviation"} so we know it&apos;s within your current state.
                 </p>
               )}
             </div>
+
           </fieldset>
 
           <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr]">

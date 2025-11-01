@@ -3,6 +3,10 @@ export type EligibilityFormState = {
   householdSize: string;
   monthlyIncome: string;
   assistanceType: "pastDue" | "moving" | "";
+  detectedCity: string;
+  detectedRegion: string;
+  detectedRegionCode: string;
+  actualCity: string;
 }
 
 export type AssistanceHistoryState = "yes" | "no" | "";
