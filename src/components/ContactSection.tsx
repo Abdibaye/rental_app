@@ -12,6 +12,7 @@ type FormState = {
   email: string
   subject: string
   message: string
+  honeypot: string
 }
 
 const baseField =
@@ -23,6 +24,7 @@ export default function ContactSection({ className }: { className?: string }) {
     email: "",
     subject: "",
     message: "",
+    honeypot: "",
   })
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState<null | string>(null)
@@ -37,6 +39,7 @@ export default function ContactSection({ className }: { className?: string }) {
     isValidEmail &&
     data.subject.trim().length > 1 &&
     data.message.trim().length > 5 &&
+  !data.honeypot &&
     !loading
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -53,7 +56,7 @@ export default function ContactSection({ className }: { className?: string }) {
       })
       if (!res.ok) throw new Error("Failed to send message")
       setSuccess("Thanks! We’ll get back to you shortly.")
-      setData({ name: "", email: "", subject: "", message: "" })
+  setData({ name: "", email: "", subject: "", message: "", honeypot: "" })
     } catch (err: any) {
       setError(err?.message ?? "Something went wrong. Please try again.")
     } finally {
@@ -132,6 +135,18 @@ export default function ContactSection({ className }: { className?: string }) {
               </div>
             </div>
 
+            <input
+              tabIndex={-1}
+              aria-hidden
+              id="company"
+              name="company"
+              type="text"
+              autoComplete="off"
+              className="hidden"
+              value={data.honeypot}
+              onChange={(e) => setData((d) => ({ ...d, honeypot: e.target.value }))}
+            />
+
             <div className="mt-5 space-y-2">
               <Label htmlFor="subject">Subject</Label>
               <input
@@ -173,7 +188,7 @@ export default function ContactSection({ className }: { className?: string }) {
             </div>
 
             <div className="mt-6 flex items-center justify-end gap-3">
-              <Button type="reset" variant="ghost" onClick={() => setData({ name: "", email: "", subject: "", message: "" })}>
+              <Button type="reset" variant="ghost" onClick={() => setData({ name: "", email: "", subject: "", message: "", honeypot: "" })}>
                 Clear
               </Button>
               <Button type="submit" disabled={!canSubmit} className="px-6">

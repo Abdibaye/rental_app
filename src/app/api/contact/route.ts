@@ -3,7 +3,11 @@ import { NextResponse } from "next/server"
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { name, email, subject, message } = body || {}
+    const { name, email, subject, message, honeypot } = body || {}
+
+    if (typeof honeypot === "string" && honeypot.trim().length > 0) {
+      return NextResponse.json({ ok: true })
+    }
 
     if (
       typeof name !== "string" ||
