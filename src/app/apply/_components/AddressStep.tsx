@@ -44,14 +44,6 @@ export function AddressStep({ data, onChange, inferredCity, disabled }: AddressS
         <CardContent className="space-y-6">
           <div className="grid gap-3 sm:grid-cols-3">
             {[{
-              icon: Sparkles,
-              title: "Smart suggestions",
-              description: "Auto-complete kicks in as you type."
-            }, {
-              icon: Wand2,
-              title: "San Francisco ready",
-              description: "We pre-set SF when you qualify."
-            }, {
               icon: Navigation,
               title: "Map verified",
               description: "We only collect what we need."
