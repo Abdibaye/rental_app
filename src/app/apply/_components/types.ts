@@ -61,7 +61,12 @@ export type HouseholdFormState = {
 
 export type EmploymentFormState = {
   employed: "yes" | "no" | "";
-  employmentType: "fullTime" | "partTime" | "gig" | "selfEmployed" | "";
+  employmentType: "fullTime" | "partTime" | "gig" | "selfEmployed" | "businessOwner" | "";
+  occupation: string;
+  employerName: string;
+  selfEmploymentDescription: string;
+  previousOccupation: string;
+  previousEmployer: string;
 }
 
 export type MultiStepFormState = {

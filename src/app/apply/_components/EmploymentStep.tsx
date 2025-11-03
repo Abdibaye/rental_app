@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { EmploymentFormState } from "./types"
 import { BriefcaseBusiness, Clock3, Home, Leaf } from "lucide-react"
@@ -11,7 +12,8 @@ const employmentTypes = [
   { value: "fullTime", label: "Full-time", helper: "40+ hours weekly" },
   { value: "partTime", label: "Part-time", helper: "Up to 39 hours weekly" },
   { value: "gig", label: "Gig / contract", helper: "Freelance or contract income" },
-  { value: "selfEmployed", label: "Self-employed", helper: "Run your own business" }
+  { value: "selfEmployed", label: "Self-employed", helper: "Run your own business" },
+  { value: "businessOwner", label: "Business owner", helper: "Own a company or storefront" }
 ]
 
 export type EmploymentStepProps = {
@@ -88,7 +90,15 @@ export function EmploymentStep({ data, onChange, disabled }: EmploymentStepProps
                     name="employed"
                     value={option}
                     checked={data.employed === option}
-                    onChange={() => onChange({ employed: option as EmploymentFormState["employed"], employmentType: "" })}
+                    onChange={() => onChange({
+                      employed: option as EmploymentFormState["employed"],
+                      employmentType: "",
+                      occupation: "",
+                      employerName: "",
+                      selfEmploymentDescription: "",
+                      previousOccupation: "",
+                      previousEmployer: ""
+                    })}
                     className="sr-only"
                     disabled={disabled}
                     required
@@ -109,42 +119,123 @@ export function EmploymentStep({ data, onChange, disabled }: EmploymentStepProps
           </fieldset>
 
           {data.employed === "yes" ? (
-            <div className="space-y-4">
-              <Label>What type of employment applies?</Label>
-              <div className="grid gap-3 md:grid-cols-2">
-                {employmentTypes.map((item) => (
-                  <label
-                    key={item.value}
-                    className={cn(
-                      "flex cursor-pointer flex-col gap-2 rounded-2xl border border-border/70 bg-background/90 p-4 text-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md",
-                      data.employmentType === item.value && "border-primary/60 bg-primary/5 shadow-lg"
-                    )}
-                  >
-                    <input
-                      type="radio"
-                      className="sr-only"
-                      name="employmentType"
-                      value={item.value}
-                      checked={data.employmentType === item.value}
-                      onChange={() => onChange({ employmentType: item.value as EmploymentFormState["employmentType"] })}
-                      disabled={disabled}
-                      required
-                    />
-                    <span className="font-semibold text-foreground">{item.label}</span>
-                    <span className="text-xs text-muted-foreground">{item.helper}</span>
-                  </label>
-                ))}
+            <div className="space-y-5">
+              <div className="space-y-4">
+                <Label>What type of employment applies?</Label>
+                <div className="grid gap-3 md:grid-cols-2">
+                  {employmentTypes.map((item) => (
+                    <label
+                      key={item.value}
+                      className={cn(
+                        "flex cursor-pointer flex-col gap-2 rounded-2xl border border-border/70 bg-background/90 p-4 text-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md",
+                        data.employmentType === item.value && "border-primary/60 bg-primary/5 shadow-lg"
+                      )}
+                    >
+                      <input
+                        type="radio"
+                        className="sr-only"
+                        name="employmentType"
+                        value={item.value}
+                        checked={data.employmentType === item.value}
+                        onChange={() => {
+                          const requiresDescription = item.value === "selfEmployed" || item.value === "businessOwner"
+                          onChange({
+                            employmentType: item.value as EmploymentFormState["employmentType"],
+                            selfEmploymentDescription: requiresDescription ? data.selfEmploymentDescription : ""
+                          })
+                        }}
+                        disabled={disabled}
+                        required
+                      />
+                      <span className="font-semibold text-foreground">{item.label}</span>
+                      <span className="text-xs text-muted-foreground">{item.helper}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="occupation" className="text-sm font-medium text-foreground">
+                    Occupation / role
+                  </Label>
+                  <Input
+                    id="occupation"
+                    value={data.occupation}
+                    onChange={(event) => onChange({ occupation: event.target.value })}
+                    disabled={disabled}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="employerName" className="text-sm font-medium text-foreground">
+                    Employer name
+                  </Label>
+                  <Input
+                    id="employerName"
+                    value={data.employerName}
+                    onChange={(event) => onChange({ employerName: event.target.value })}
+                    disabled={disabled}
+                    required
+                  />
+                </div>
+              </div>
+
+              {(data.employmentType === "selfEmployed" || data.employmentType === "businessOwner") && (
+                <div className="space-y-2">
+                  <Label htmlFor="selfEmploymentDescription" className="text-sm font-medium text-foreground">
+                    Describe what you do or the nature of your business
+                  </Label>
+                  <textarea
+                    id="selfEmploymentDescription"
+                    value={data.selfEmploymentDescription}
+                    onChange={(event) => onChange({ selfEmploymentDescription: event.target.value })}
+                    disabled={disabled}
+                    required
+                    rows={4}
+                    className="min-h-[112px] w-full rounded-2xl border border-border/70 bg-background/95 p-3 text-sm text-foreground shadow-sm focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40"
+                  />
+                </div>
+              )}
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed border-border/70 bg-background/80 p-5 text-sm text-muted-foreground">
-              <div className="flex items-center gap-3 text-primary">
-                <Home className="h-4 w-4" aria-hidden />
-                Looking for work or on leave?
+            <div className="space-y-5">
+              <div className="rounded-2xl border border-dashed border-border/70 bg-background/80 p-5 text-sm text-muted-foreground">
+                <div className="flex items-center gap-3 text-primary">
+                  <Home className="h-4 w-4" aria-hidden />
+                  Looking for work or on leave?
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  We&apos;ll connect you with partner organizations and focus your application on housing and stability resources.
+                </p>
               </div>
-              <p className="mt-2 text-xs text-muted-foreground">
-                We&apos;ll connect you with partner organizations and focus your application on housing and stability resources.
-              </p>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="previousOccupation" className="text-sm font-medium text-foreground">
+                    Previous occupation / role
+                  </Label>
+                  <Input
+                    id="previousOccupation"
+                    value={data.previousOccupation}
+                    onChange={(event) => onChange({ previousOccupation: event.target.value })}
+                    disabled={disabled}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="previousEmployer" className="text-sm font-medium text-foreground">
+                    Previous employer
+                  </Label>
+                  <Input
+                    id="previousEmployer"
+                    value={data.previousEmployer}
+                    onChange={(event) => onChange({ previousEmployer: event.target.value })}
+                    disabled={disabled}
+                    required
+                  />
+                </div>
+              </div>
             </div>
           )}
 

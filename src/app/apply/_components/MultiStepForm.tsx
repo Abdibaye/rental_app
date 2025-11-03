@@ -113,7 +113,12 @@ const defaultFormState: MultiStepFormState = {
   },
   employment: {
     employed: "",
-    employmentType: ""
+    employmentType: "",
+    occupation: "",
+    employerName: "",
+    selfEmploymentDescription: "",
+    previousOccupation: "",
+    previousEmployer: ""
   }
 }
 
@@ -205,7 +210,23 @@ export function MultiStepForm() {
   const isEmploymentValid = useMemo(() => {
     const values = formState.employment
     if (!values.employed) return false
-    if (values.employed === "yes" && !values.employmentType) return false
+    if (values.employed === "yes") {
+      if (!values.employmentType) return false
+      const occupation = (values.occupation ?? "").trim()
+      const employer = (values.employerName ?? "").trim()
+      if (!occupation || !employer) return false
+      const description = (values.selfEmploymentDescription ?? "").trim()
+      if ((values.employmentType === "selfEmployed" || values.employmentType === "businessOwner") && !description) {
+        return false
+      }
+    }
+    if (values.employed === "no") {
+      const previousOccupation = (values.previousOccupation ?? "").trim()
+      const previousEmployer = (values.previousEmployer ?? "").trim()
+      if (!previousOccupation || !previousEmployer) {
+        return false
+      }
+    }
     return true
   }, [formState.employment])
 

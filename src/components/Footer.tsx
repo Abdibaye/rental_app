@@ -1,28 +1,23 @@
 import Link from "next/link"
-import { Mail, MapPin, Phone, Facebook, Twitter, Instagram, Linkedin } from "lucide-react"
+import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react"
 
 export default function Footer() {
   return (
     <footer className="border-t">
       <div className="mx-auto max-w-6xl px-6 py-12">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
-          {/* Contact Us */}
+          {/* Contact CTA */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold tracking-tight">Contact Us</h3>
-            <ul className="space-y-3 text-sm text-muted-foreground">
-              <li className="flex items-start gap-3">
-                <Mail className="mt-0.5 size-4" aria-hidden="true" />
-                <span>support@staterent.example</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <Phone className="mt-0.5 size-4" aria-hidden="true" />
-                <span>+1 (555) 123-4567</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <MapPin className="mt-0.5 size-4" aria-hidden="true" />
-                <span>123 Main Street, Suite 200, Anytown, USA</span>
-              </li>
-            </ul>
+            <h3 className="text-lg font-semibold tracking-tight">Need support?</h3>
+            <p className="text-sm text-muted-foreground">
+              We&apos;re a free service, so the quickest way to reach the team is through our contact form. Drop us a note and we&apos;ll follow up soon.
+            </p>
+            <Link
+              href="/#contact"
+              className="inline-flex w-fit items-center justify-center rounded-full border border-primary/40 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/10"
+            >
+              Open contact form
+            </Link>
           </div>
 
           {/* Quick Links */}
@@ -36,10 +31,7 @@ export default function Footer() {
                 <Link href="/eligibility" className="text-muted-foreground hover:text-foreground transition-colors">Eligibility</Link>
               </li>
               <li>
-                <Link href="#apply" className="text-muted-foreground hover:text-foreground transition-colors">Apply Now</Link>
-              </li>
-              <li>
-                <Link href="#how-it-works" className="text-muted-foreground hover:text-foreground transition-colors">How It Works</Link>
+                <Link href="/#contact" className="text-muted-foreground hover:text-foreground transition-colors">Contact form</Link>
               </li>
             </ul>
           </div>
