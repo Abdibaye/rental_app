@@ -71,7 +71,13 @@ const defaultFormState: MultiStepFormState = {
     detectedCity: "",
     detectedRegion: "",
     detectedRegionCode: "",
-    actualCity: ""
+    actualCity: "",
+    newApartmentStreet: "",
+    newApartmentUnit: "",
+    newApartmentCity: "",
+    newApartmentState: "",
+    newApartmentZip: "",
+    newApartmentAddressConfirmation: ""
   },
   applicantInfo: {
     referralSource: "",
@@ -107,7 +113,12 @@ const defaultFormState: MultiStepFormState = {
   },
   employment: {
     employed: "",
-    employmentType: ""
+    employmentType: "",
+    occupation: "",
+    employerName: "",
+    selfEmploymentDescription: "",
+    previousOccupation: "",
+    previousEmployer: ""
   }
 }
 
@@ -140,6 +151,17 @@ export function MultiStepForm() {
     if (!values.householdSize.trim()) return false
     if (!values.monthlyIncome.trim()) return false
     if (!values.assistanceType.trim()) return false
+    if (values.assistanceType === "pastDue") return false
+    if (values.assistanceType === "moving") {
+      const street = (values.newApartmentStreet ?? "").trim()
+      const city = (values.newApartmentCity ?? "").trim()
+      const state = (values.newApartmentState ?? "").trim()
+      const zip = (values.newApartmentZip ?? "").trim()
+      const confirmation = values.newApartmentAddressConfirmation ?? ""
+      if (!street || !city || !state || !zip) return false
+      if (!/^\d{5}(?:-\d{4})?$/.test(zip)) return false
+      if (!confirmation) return false
+    }
     const actualCity = (values.actualCity ?? "").trim()
     const detectedState = (values.detectedRegion || values.detectedRegionCode || "").trim().toLowerCase()
     const detectedStateCode = (values.detectedRegionCode || "").trim().toLowerCase()
@@ -188,7 +210,23 @@ export function MultiStepForm() {
   const isEmploymentValid = useMemo(() => {
     const values = formState.employment
     if (!values.employed) return false
-    if (values.employed === "yes" && !values.employmentType) return false
+    if (values.employed === "yes") {
+      if (!values.employmentType) return false
+      const occupation = (values.occupation ?? "").trim()
+      const employer = (values.employerName ?? "").trim()
+      if (!occupation || !employer) return false
+      const description = (values.selfEmploymentDescription ?? "").trim()
+      if ((values.employmentType === "selfEmployed" || values.employmentType === "businessOwner") && !description) {
+        return false
+      }
+    }
+    if (values.employed === "no") {
+      const previousOccupation = (values.previousOccupation ?? "").trim()
+      const previousEmployer = (values.previousEmployer ?? "").trim()
+      if (!previousOccupation || !previousEmployer) {
+        return false
+      }
+    }
     return true
   }, [formState.employment])
 

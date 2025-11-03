@@ -1,11 +1,11 @@
 "use client"
 
-import { useEffect } from "react"
+import { ChangeEvent, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { fetchLocationWithCache } from "@/lib/locationClient"
-import { BadgeCheck, Info, MapPin, ShieldCheck, Sparkles, Timer, Users, Wallet } from "lucide-react"
+import { BadgeCheck, Ban, Info, MapPin, ShieldCheck, Sparkles, Timer, Users, Wallet } from "lucide-react"
 import { EligibilityFormState } from "./types"
 const isSanFrancisco = (value: string) => /san\s*francisco/i.test(value)
 
@@ -25,14 +25,40 @@ export function EligibilityStep({ data, onChange, disabled }: EligibilityStepPro
   const overridePlaceholder = stateLabelForDisplay ? `e.g. City, ${stateLabelForDisplay}` : "e.g. City, State"
   const normalizedStateName = detectedRegionName.toLowerCase()
   const normalizedStateCode = detectedRegionCode.toLowerCase()
-  const matchesStateName = (value: string) => normalizedStateName ? value.includes(normalizedStateName) : false
-    const matchesStateCode = (value: string) => normalizedStateCode ? new RegExp(`\\b${normalizedStateCode}\\b`).test(value) : false
+  const matchesStateName = (value: string) => (normalizedStateName ? value.includes(normalizedStateName) : false)
+  const matchesStateCode = (value: string) => (normalizedStateCode ? new RegExp(`\\b${normalizedStateCode}\\b`).test(value) : false)
   const normalizedActualCity = actualCityValue.trim().toLowerCase()
   const hasStateInfo = Boolean(detectedRegionName || detectedRegionCode)
   const actualCityInvalid = hasStateInfo && normalizedActualCity.length > 0 && !matchesStateName(normalizedActualCity) && !matchesStateCode(normalizedActualCity)
   const detectedLocationRaw = [detectedCityName, stateDescriptor].filter(Boolean).join(", ")
   const hasDetectedLocation = detectedLocationRaw.length > 0
   const detectedLocationDisplay = hasDetectedLocation ? detectedLocationRaw : "Detecting location…"
+  const newApartmentStreet = data.newApartmentStreet ?? ""
+  const newApartmentUnit = data.newApartmentUnit ?? ""
+  const newApartmentCity = data.newApartmentCity ?? ""
+  const newApartmentState = data.newApartmentState ?? ""
+  const newApartmentZip = data.newApartmentZip ?? ""
+  const newApartmentAddressConfirmation = data.newApartmentAddressConfirmation ?? ""
+  const isNewApartmentRequest = data.assistanceType === "moving"
+  const normalizedNewApartmentZip = newApartmentZip.trim()
+  const newApartmentZipInvalid = isNewApartmentRequest && normalizedNewApartmentZip.length > 0 && !/^\d{5}(?:-\d{4})?$/.test(normalizedNewApartmentZip)
+
+  const handleAssistanceTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value as EligibilityFormState["assistanceType"]
+    if (value !== "moving") {
+      onChange({
+        assistanceType: value,
+        newApartmentStreet: "",
+        newApartmentUnit: "",
+        newApartmentCity: "",
+        newApartmentState: "",
+        newApartmentZip: "",
+        newApartmentAddressConfirmation: ""
+      })
+      return
+    }
+    onChange({ assistanceType: value })
+  }
 
   useEffect(() => {
     if (!data.detectedCity || data.detectedRegion || data.detectedRegionCode) return
@@ -101,7 +127,7 @@ export function EligibilityStep({ data, onChange, disabled }: EligibilityStepPro
         </p>
       </div>
 
-      <Card className="border-none bg-gradient-to-br from-background via-background to-primary/5 shadow-xl backdrop-blur-md ring-1 ring-border/50">
+    <Card className="border-none bg-linear-to-br from-background via-background to-primary/5 shadow-xl backdrop-blur-md ring-1 ring-border/50">
         <CardHeader className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle className="text-lg font-semibold">Overview &amp; eligibility</CardTitle>
@@ -147,7 +173,7 @@ export function EligibilityStep({ data, onChange, disabled }: EligibilityStepPro
             })}
           </div>
 
-          <fieldset className="space-y-6 rounded-3xl border border-border/60 bg-gradient-to-br from-background/90 via-background/70 to-primary/10 p-6 shadow-sm">
+          <fieldset className="space-y-6 rounded-3xl border border-border/60 bg-linear-to-br from-background/90 via-background/70 to-primary/10 p-6 shadow-sm">
             <legend className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/70">
               Location Check
             </legend>
@@ -259,20 +285,20 @@ export function EligibilityStep({ data, onChange, disabled }: EligibilityStepPro
                 />
                 <p className="flex items-start gap-2 text-xs text-muted-foreground">
                   <Info className="mt-0.5 h-3.5 w-3.5" aria-hidden />
-                  Please include income from employment (formal or informal) and cash benefits from the last 30 days. If you have savings or cash resources that total three times your monthly rent, you are not eligible for this program.
+                  Please include income from employment (formal or informal) and cash benefits from the last 30 days.
                 </p>
               </div>
             </div>
 
             <div className="space-y-3 rounded-2xl border border-border/70 bg-background/70 p-5 shadow-sm">
               <Label htmlFor="assistanceType" className="text-sm font-semibold text-foreground">
-                Are you applying for assistance with past-due rent OR assistance with moving into a new unit (security deposit, etc.)?
+                Are you applying for assistance with past-due rent or moving into a new apartment?
               </Label>
               <div className="relative">
                 <select
                   id="assistanceType"
                   value={data.assistanceType}
-                  onChange={(event) => onChange({ assistanceType: event.target.value as EligibilityFormState["assistanceType"] })}
+                  onChange={handleAssistanceTypeChange}
                   className="h-12 w-full appearance-none rounded-xl border border-transparent bg-primary/10 px-4 text-sm font-medium text-primary shadow-sm transition focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={disabled}
                   required
@@ -281,7 +307,7 @@ export function EligibilityStep({ data, onChange, disabled }: EligibilityStepPro
                     Select support type
                   </option>
                   <option value="pastDue">Past-due rent</option>
-                  <option value="moving">Moving assistance</option>
+                  <option value="moving">New apartment</option>
                 </select>
                 <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-primary/70">
                   ▾
@@ -292,6 +318,124 @@ export function EligibilityStep({ data, onChange, disabled }: EligibilityStepPro
                 We tailor document checklists based on the assistance you select.
               </p>
             </div>
+
+            {data.assistanceType === "pastDue" && (
+              <div className="space-y-2 rounded-2xl border border-destructive/40 bg-destructive/5 p-5 text-sm text-destructive" role="alert" aria-live="polite">
+                <div className="flex items-start gap-3">
+                  <Ban className="mt-0.5 h-5 w-5 flex-none" aria-hidden />
+                  <span>
+                    We currently cover move-in costs only. Because you selected past-due rent, we have to pause your application. Please check back soon—support for overdue rent is coming.
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {isNewApartmentRequest && (
+              <fieldset className="space-y-5 rounded-2xl border border-primary/20 bg-background/90 p-6 shadow-sm lg:col-span-2">
+                <legend className="px-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary/70">New apartment address</legend>
+                <p className="text-xs text-muted-foreground sm:text-sm">
+                  Share the move-in address so we can match your rental assistance to the correct home.
+                </p>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label htmlFor="newApartmentStreet" className="text-sm font-medium text-foreground">
+                      Street address
+                    </Label>
+                    <Input
+                      id="newApartmentStreet"
+                      value={newApartmentStreet}
+                      onChange={(event) => onChange({ newApartmentStreet: event.target.value })}
+                      disabled={disabled}
+                      required
+                      className="h-11 rounded-xl border-border/70 bg-background/95 shadow-sm focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="newApartmentUnit" className="text-sm font-medium text-foreground">
+                      Unit, Apt, or Suite (optional)
+                    </Label>
+                    <Input
+                      id="newApartmentUnit"
+                      value={newApartmentUnit}
+                      onChange={(event) => onChange({ newApartmentUnit: event.target.value })}
+                      disabled={disabled}
+                      className="h-11 rounded-xl border-border/70 bg-background/95 shadow-sm focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="newApartmentCity" className="text-sm font-medium text-foreground">
+                      City
+                    </Label>
+                    <Input
+                      id="newApartmentCity"
+                      value={newApartmentCity}
+                      onChange={(event) => onChange({ newApartmentCity: event.target.value })}
+                      disabled={disabled}
+                      required
+                      className="h-11 rounded-xl border-border/70 bg-background/95 shadow-sm focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="newApartmentState" className="text-sm font-medium text-foreground">
+                      State
+                    </Label>
+                    <Input
+                      id="newApartmentState"
+                      value={newApartmentState}
+                      onChange={(event) => onChange({ newApartmentState: event.target.value.toUpperCase() })}
+                      disabled={disabled}
+                      required
+                      maxLength={2}
+                      className="h-11 rounded-xl border-border/70 bg-background/95 uppercase shadow-sm focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40"
+                    />
+                  </div>
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label htmlFor="newApartmentZip" className="text-sm font-medium text-foreground">
+                      ZIP code
+                    </Label>
+                    <Input
+                      id="newApartmentZip"
+                      value={newApartmentZip}
+                      onChange={(event) => onChange({ newApartmentZip: event.target.value })}
+                      disabled={disabled}
+                      required
+                      inputMode="numeric"
+                      aria-invalid={newApartmentZipInvalid}
+                      className="h-11 rounded-xl border-border/70 bg-background/95 shadow-sm focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40"
+                    />
+                    {newApartmentZipInvalid && (
+                      <p className="text-xs font-medium text-destructive">
+                        Please enter a valid 5-digit ZIP code (add the +4 if available).
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="newApartmentAddressConfirmation" className="text-sm font-semibold text-foreground">
+                    Is this the address where you need rental assistance?
+                  </Label>
+                  <div className="relative">
+                    <select
+                      id="newApartmentAddressConfirmation"
+                      value={newApartmentAddressConfirmation}
+                      onChange={(event) => onChange({ newApartmentAddressConfirmation: event.target.value as EligibilityFormState["newApartmentAddressConfirmation"] })}
+                      className="h-11 w-full appearance-none rounded-xl border border-border/70 bg-background/95 px-4 text-sm font-medium text-foreground shadow-sm transition focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      required
+                      disabled={disabled}
+                    >
+                      <option value="" disabled>
+                        Select an option
+                      </option>
+                      <option value="yes">Yes</option>
+                      <option value="no">No</option>
+                    </select>
+                    <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-primary/50">
+                      ▾
+                    </span>
+                  </div>
+                </div>
+              </fieldset>
+            )}
           </div>
         </CardContent>
       </Card>
