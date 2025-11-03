@@ -79,6 +79,10 @@ export default function EligibilityPage() {
                   </li>
                   <li className="flex items-start gap-3">
                     <Info className="mt-0.5 h-5 w-5 flex-none text-primary" />
+                    <span>Applicants should have already toured the new apartment they want rental assistance for before submitting a program application.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Info className="mt-0.5 h-5 w-5 flex-none text-primary" />
                     <span>Assistance for back rent or for your current unit will be available soon.</span>
                   </li>
                   <li className="flex items-start gap-3">

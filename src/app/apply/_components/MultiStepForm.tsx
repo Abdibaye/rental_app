@@ -71,7 +71,13 @@ const defaultFormState: MultiStepFormState = {
     detectedCity: "",
     detectedRegion: "",
     detectedRegionCode: "",
-    actualCity: ""
+    actualCity: "",
+    newApartmentStreet: "",
+    newApartmentUnit: "",
+    newApartmentCity: "",
+    newApartmentState: "",
+    newApartmentZip: "",
+    newApartmentAddressConfirmation: ""
   },
   applicantInfo: {
     referralSource: "",
@@ -140,6 +146,17 @@ export function MultiStepForm() {
     if (!values.householdSize.trim()) return false
     if (!values.monthlyIncome.trim()) return false
     if (!values.assistanceType.trim()) return false
+    if (values.assistanceType === "pastDue") return false
+    if (values.assistanceType === "moving") {
+      const street = (values.newApartmentStreet ?? "").trim()
+      const city = (values.newApartmentCity ?? "").trim()
+      const state = (values.newApartmentState ?? "").trim()
+      const zip = (values.newApartmentZip ?? "").trim()
+      const confirmation = values.newApartmentAddressConfirmation ?? ""
+      if (!street || !city || !state || !zip) return false
+      if (!/^\d{5}(?:-\d{4})?$/.test(zip)) return false
+      if (!confirmation) return false
+    }
     const actualCity = (values.actualCity ?? "").trim()
     const detectedState = (values.detectedRegion || values.detectedRegionCode || "").trim().toLowerCase()
     const detectedStateCode = (values.detectedRegionCode || "").trim().toLowerCase()

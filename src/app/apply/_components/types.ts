@@ -7,6 +7,12 @@ export type EligibilityFormState = {
   detectedRegion: string;
   detectedRegionCode: string;
   actualCity: string;
+  newApartmentStreet: string;
+  newApartmentUnit: string;
+  newApartmentCity: string;
+  newApartmentState: string;
+  newApartmentZip: string;
+  newApartmentAddressConfirmation: "yes" | "no" | "";
 }
 
 export type AssistanceHistoryState = "yes" | "no" | "";
