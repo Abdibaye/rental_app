@@ -247,7 +247,7 @@ export function HouseholdStep({ data, onChange, disabled }: HouseholdStepProps) 
                             id={`member-name-${index}`}
                             value={member.name}
                             onChange={(event) => handleMemberChange(index, "name", event.target.value)}
-                            placeholder="Jane Doe"
+                            placeholder="Alex Soros"
                             disabled={disabled}
                           />
                         </div>
