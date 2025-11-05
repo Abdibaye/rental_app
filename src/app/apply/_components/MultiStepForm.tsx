@@ -1,10 +1,11 @@
 "use client"
 
 import { useCallback, useMemo, useState } from "react"
+import { useRouter } from "next/navigation"
 import { useLocalStorage } from "usehooks-ts"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { ArrowRight, Check, CheckCircle2, ChevronLeft, ShieldCheck, Sparkles, X } from "lucide-react"
+import { ArrowRight, Check, ChevronLeft, ShieldCheck, Sparkles, X } from "lucide-react"
 import { EligibilityStep } from "./EligibilityStep"
 import { ApplicantInformationStep } from "./ApplicantInformationStep"
 import { DemographicsStep } from "./DemographicsStep"
@@ -23,7 +24,6 @@ import {
   EmploymentFormState
 } from "./types"
 import { FormStepper } from "./FormStepper"
-import BasicModal from "@/components/smoothui/ui/BasicModal"
 
 const FORM_STORAGE_KEY = "rental-application/form-state-v1"
 const STEP_STORAGE_KEY = "rental-application/form-step-v1"
@@ -123,13 +123,16 @@ const defaultFormState: MultiStepFormState = {
 }
 
 export function MultiStepForm() {
+  const router = useRouter()
   const [formState, setFormState] = useLocalStorage<MultiStepFormState>(FORM_STORAGE_KEY, defaultFormState)
   const [currentStepIndex, setCurrentStepIndex] = useLocalStorage<number>(STEP_STORAGE_KEY, 0)
   const [approvalGranted, setApprovalGranted] = useLocalStorage<boolean>(APPROVAL_STORAGE_KEY, false)
   const [approvalPromptOpen, setApprovalPromptOpen] = useState(false)
-  const [submissionModalOpen, setSubmissionModalOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submissionError, setSubmissionError] = useState<string | null>(null)
 
   const currentStep = stepDefinitions[currentStepIndex]
+  const isFinalStep = currentStepIndex >= stepDefinitions.length - 1
 
   const updateStep = useCallback(<K extends StepKey>(stepKey: K, value: Partial<MultiStepFormState[K]>) => {
     setFormState((prev) => ({
@@ -250,25 +253,47 @@ export function MultiStepForm() {
     }
   }, [currentStep, isEligibilityValid, isApplicantInfoValid, isAddressValid, isHouseholdValid, isEmploymentValid])
 
-  const handleNext = useCallback(() => {
+  const handleNext = useCallback(async () => {
+    if (isSubmitting) return
     if (isNextDisabled) return
     if (currentStep?.id === "applicantInfo" && !approvalGranted) {
       setApprovalPromptOpen(true)
       return
     }
     if (currentStepIndex >= stepDefinitions.length - 1) {
-      setSubmissionModalOpen(true)
-      setFormState(defaultFormState)
-      setCurrentStepIndex(0)
-      setApprovalGranted(false)
+      setSubmissionError(null)
+      setIsSubmitting(true)
+      try {
+        const response = await fetch("/api/application/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formState)
+        })
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({ error: "Unable to process application." }))
+          throw new Error(data.error ?? "Unable to process application.")
+        }
+        const data = await response.json()
+  const applicationNumber = typeof data.applicationNumber === "string" ? data.applicationNumber : undefined
+        setFormState(defaultFormState)
+        setCurrentStepIndex(0)
+        setApprovalGranted(false)
+        router.push(applicationNumber ? `/apply/submitted?ref=${encodeURIComponent(applicationNumber)}` : "/apply/submitted")
+      } catch (error: any) {
+        setSubmissionError(error?.message ?? "Something went wrong. Please try again.")
+      } finally {
+        setIsSubmitting(false)
+      }
       return
     }
+    setSubmissionError(null)
     goToStep(currentStepIndex + 1)
-  }, [approvalGranted, currentStep?.id, currentStepIndex, goToStep, isNextDisabled, setApprovalGranted, setCurrentStepIndex, setFormState, setSubmissionModalOpen])
+  }, [approvalGranted, currentStep?.id, currentStepIndex, formState, goToStep, isNextDisabled, isSubmitting, router, setApprovalGranted, setCurrentStepIndex, setFormState])
 
   const handleBack = useCallback(() => {
+    setSubmissionError(null)
     goToStep(currentStepIndex - 1)
-  }, [currentStepIndex, goToStep])
+  }, [currentStepIndex, goToStep, setSubmissionError])
 
   const handleApprovalDecline = useCallback(() => {
     setApprovalPromptOpen(false)
@@ -279,10 +304,6 @@ export function MultiStepForm() {
     setApprovalPromptOpen(false)
     goToStep(currentStepIndex + 1)
   }, [currentStepIndex, goToStep, setApprovalGranted])
-
-  const handleCloseSubmissionModal = useCallback(() => {
-    setSubmissionModalOpen(false)
-  }, [])
 
   const renderStep = useCallback(() => {
     if (!currentStep) return null
@@ -414,38 +435,22 @@ export function MultiStepForm() {
               </Button>
               <Button
                 onClick={handleNext}
-                disabled={isNextDisabled}
+                disabled={isNextDisabled || isSubmitting}
                 className="group gap-2 from-primary to-primary/80 shadow-lg transition duration-300 hover:-translate-y-0.5 hover:shadow-xl disabled:hover:translate-y-0"
               >
-                {currentStepIndex >= stepDefinitions.length - 1 ? "Finish" : "Next"}
+                {isFinalStep ? (isSubmitting ? "Submitting..." : "Finish") : "Next"}
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" aria-hidden />
               </Button>
             </div>
           </div>
+
+          {submissionError && (
+            <div className="rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+              {submissionError}
+            </div>
+          )}
         </CardContent>
       </Card>
-
-      <BasicModal
-        isOpen={submissionModalOpen}
-        onClose={handleCloseSubmissionModal}
-        title="Application submitted"
-        size="md"
-      >
-        <div className="flex flex-col items-center gap-4 text-center">
-          <div className="flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <CheckCircle2 className="h-10 w-10" aria-hidden />
-          </div>
-          <div className="space-y-1">
-            <h4 className="text-xl font-semibold text-foreground">Thank you!</h4>
-            <p className="text-sm text-muted-foreground">
-              Your application has been submitted. Our team will review the details and follow up shortly.
-            </p>
-          </div>
-          <Button onClick={handleCloseSubmissionModal} className="px-6">
-            Close
-          </Button>
-        </div>
-      </BasicModal>
     </div>
   )
 }
