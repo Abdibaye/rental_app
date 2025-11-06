@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Manrope, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { Analytics } from '@vercel/analytics/next';
+
 
 const manrope = Manrope({
   variable: "--font-geist-sans",
@@ -29,6 +31,7 @@ export default function RootLayout({
       <body className={`${manrope.variable} ${geistMono.variable} min-h-screen bg-background text-foreground antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
