@@ -242,9 +242,9 @@ export async function POST(request: Request) {
               <div style="margin:0 0 20px;padding:20px;border-radius:16px;background:#eff6ff;border:1px solid #bfdbfe;">
                 <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#1d4ed8;text-transform:uppercase;letter-spacing:0.12em;">Documents to send</p>
                 <ul style="margin:0;padding:0 0 0 18px;font-size:14px;color:#1e3a8a;line-height:1.6;">
-                  <li>Front and back of a valid government-issued ID.</li>
+                  <li>Any valid government ID (front &amp; back clear pictures).</li>
                   <li>Three months of recent bank statements.</li>
-                  <li>Three months of pay stubs or current proof of income.</li>
+                  <li>Most recent W2.</li>
                 </ul>
                 <p style="margin:12px 0 0;font-size:13px;color:#1d4ed8;">Attach these files when you reply to our email. Secure uploads help us verify eligibility quickly.</p>
                 <p style="margin:12px 0 0;font-size:13px;color:#1d4ed8;">Use the subject line <strong>${escapeHtml(documentsSubjectLine)}</strong> so we can match your documents right away.</p>
@@ -267,7 +267,7 @@ export async function POST(request: Request) {
       "",
       "What happens next:",
       "- Watch your inbox (including spam) for our email within 5 business days.",
-  "- Reply with the front and back of your ID, plus three months of bank statements and pay stubs.",
+  "- Reply with Most recent W2 and Any valid government ID (front & back clear pictures).",
   `- Use the subject line "${documentsSubjectLine}" when you send those documents.`,
       "- Add any updates about your situation directly in that reply.",
       "",
