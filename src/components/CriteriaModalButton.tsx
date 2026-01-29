@@ -47,8 +47,8 @@ export default function CriteriaModalButton() {
           <section className="space-y-3">
             <h3 className="text-lg font-semibold tracking-tight md:text-xl">Documentation Required</h3>
             <ul className="list-disc space-y-2 pl-5">
-              <li>Any valid government ID (front & back clear pictures).</li>
-              <li>Most recent W2.</li>
+              <li>A valid government-issued ID.</li>
+              <li>Recent pay stub(s).</li>
               <li>Bank statements from the last two months.</li>
               <li>Additional documentation may be requested if needed.</li>
             </ul>

@@ -105,11 +105,11 @@ export default function EligibilityPage() {
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
                     <FileText className="mt-0.5 h-5 w-5 flex-none text-primary" />
-                    <span>Any valid government ID (front & back clear pictures).</span>
+                    <span>A valid government-issued ID.</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <FileText className="mt-0.5 h-5 w-5 flex-none text-primary" />
-                    <span>Most recent W2.</span>
+                    <span>Recent pay stub(s).</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <FileText className="mt-0.5 h-5 w-5 flex-none text-primary" />
