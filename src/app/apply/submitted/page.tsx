@@ -86,7 +86,6 @@ export default async function ApplicationSubmittedPage({ searchParams }: { searc
                   </p>
                   <ul className="list-inside list-disc space-y-2 text-muted-foreground">
                     <li>Any valid government ID (front & back clear pictures)</li>
-                    <li>Three months of recent bank statements</li>
                     <li>Most recent W2</li>
                   </ul>
                   <p className="text-muted-foreground">
