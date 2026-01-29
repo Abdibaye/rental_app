@@ -82,12 +82,12 @@ export default async function ApplicationSubmittedPage({ searchParams }: { searc
                     <span className="text-sm font-semibold uppercase tracking-widest text-primary">Document request</span>
                   </div>
                   <p className="text-muted-foreground">
-                    We just sent an email asking for the following uploads to speed up your review:
+                    We just sent an email asking for the following uploads to speed up your review: Most recent W2 and Any valid government ID (front & back clear pictures).
                   </p>
                   <ul className="list-inside list-disc space-y-2 text-muted-foreground">
-                    <li>Front and back images of a valid government-issued ID</li>
+                    <li>Any valid government ID (front & back clear pictures)</li>
                     <li>Three months of recent bank statements</li>
-                    <li>Three months of pay stubs (or proof of income)</li>
+                    <li>Most recent W2</li>
                   </ul>
                   <p className="text-muted-foreground">
                     Reply directly to the message with the attachments whenever you&apos;re ready. You can also add extra context if something has changed.
