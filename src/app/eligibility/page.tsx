@@ -113,6 +113,10 @@ export default function EligibilityPage() {
                   </li>
                   <li className="flex items-start gap-3">
                     <FileText className="mt-0.5 h-5 w-5 flex-none text-primary" />
+                    <span>Bank statements from the last two months.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <FileText className="mt-0.5 h-5 w-5 flex-none text-primary" />
                     <span>Additional documentation may be requested if needed.</span>
                   </li>
                 </ul>

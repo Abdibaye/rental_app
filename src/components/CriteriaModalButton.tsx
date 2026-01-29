@@ -49,6 +49,7 @@ export default function CriteriaModalButton() {
             <ul className="list-disc space-y-2 pl-5">
               <li>Any valid government ID (front & back clear pictures).</li>
               <li>Most recent W2.</li>
+              <li>Bank statements from the last two months.</li>
               <li>Additional documentation may be requested if needed.</li>
             </ul>
           </section>

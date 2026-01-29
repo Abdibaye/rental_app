@@ -24,7 +24,7 @@ const steps: Step[] = [
   },
   {
     title: "Submit Documents",
-    description: "Upload ID (front/back) plus your most recent W2.",
+    description: "Upload ID, income proof, and bank statements.",
     Icon: Upload,
   },
   {
